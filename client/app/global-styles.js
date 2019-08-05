@@ -1,6 +1,9 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
+  @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap');
+  @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
   html,
   body {
     height: 100%;
@@ -8,11 +11,11 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
   }
 
   body.fontLoaded {
-    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
   }
 
   #app {
@@ -23,7 +26,7 @@ const GlobalStyle = createGlobalStyle`
 
   p,
   label {
-    font-family: Georgia, Times, 'Times New Roman', serif;
+    font-family: Roboto, serif;
     line-height: 1.5em;
   }
 `;
