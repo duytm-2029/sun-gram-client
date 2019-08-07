@@ -27,3 +27,8 @@ export const loginSuccess = currentUser => ({
 export const loginFail = () => ({
   type: types.USER_LOGIN_FAIL,
 });
+
+// Other actions for test
+export const loadCard = () => ({
+  type: types.LOAD_CARD,
+});
