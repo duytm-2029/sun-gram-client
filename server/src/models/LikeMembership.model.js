@@ -6,8 +6,8 @@ module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
   const LikeMembership = new Schema({
-    comment: {type: String, required: true, ref: 'posts', index: true},
-    reply: {type: String, required: true, ref: 'comments', index: true},
+    post: {type: String, required: false, ref: 'posts', index: true},
+    comment: {type: String, required: false, ref: 'comments', index: true},
   }, {
     timestamps: true
   });
