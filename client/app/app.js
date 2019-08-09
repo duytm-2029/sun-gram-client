@@ -13,8 +13,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import history from 'utils/history';
-import 'sanitize.css/sanitize.css';
+import './styles/app.css';
 // import './index.css';
 
 // Import root app
@@ -22,6 +23,7 @@ import App from 'containers/App';
 
 // Import Language Provider
 import LanguageProvider from 'containers/LanguageProvider';
+import config from './config';
 
 // Load the favicon and the .htaccess file
 /* eslint-disable import/no-unresolved, import/extensions */
@@ -34,6 +36,16 @@ import configureStore from './configureStore';
 // Import i18n messages
 import { translationMessages } from './i18n';
 
+const theme = createMuiTheme({
+  palette: {
+    primary: { main: config.theme.primaryColor },
+    secondary: { main: config.theme.secondaryColor },
+  },
+  typography: {
+    useNextVariants: true,
+  },
+});
+
 // Create redux store with history
 const initialState = {};
 const store = configureStore(initialState, history);
@@ -44,7 +56,9 @@ const render = messages => {
     <Provider store={store}>
       <LanguageProvider messages={messages}>
         <ConnectedRouter history={history}>
-          <App />
+          <MuiThemeProvider theme={theme}>
+            <App />
+          </MuiThemeProvider>
         </ConnectedRouter>
       </LanguageProvider>
     </Provider>,

@@ -21,7 +21,6 @@ import GlobalStyle from '../../global-styles';
 export default function App() {
   return (
     <Container>
-      <Header />
       <Switch>
         <Route exact path="/" component={HomePage} />
         <Route component={NotFoundPage} />
