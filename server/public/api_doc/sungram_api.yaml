@@ -1,0 +1,849 @@
+swagger: "2.0"
+info:
+  title: "Sun*gram API"
+  version: "1.0.0"
+  description: |
+   
+basePath: "/v1"
+tags:
+- name: "registration and authentication"
+- name: "account"
+- name: "users"
+- name: "posts"
+- name: "personal"
+- name: "replies"
+- name: "timeline"
+- name: "post-detail"
+- name: "media"
+schemes:
+- "https"
+produces:
+- "application/json"
+consumes:
+- 'application/x-www-form-urlencoded'
+paths:
+  /auth/signin:
+    post:
+      operationId: "authSignin"
+      tags:
+      - "registration and authentication"
+      summary: "Sign in using email and password"
+      consumes: ['application/x-www-form-urlencoded']
+      security:
+        - signed: []
+
+      parameters:
+      - in: formData
+        name: email
+        type: string
+        required: true
+      - in: formData
+        name: password
+        type: string
+        required: true
+      responses:
+        200:
+          description: "Sign in successfully"
+          schema:
+            $ref: '#/definitions/StartSession'
+
+  /auth/signout:
+    post:
+      operationId: 'destroySession'
+      tags:
+      - "registration and authentication"
+      summary: "Delete current authentication (signout)"
+      security:
+        - signed: []
+          auth: []
+      consumes: ['application/x-www-form-urlencoded']
+      responses:
+        204:
+          description: "Logout successfully"
+        401:
+          description: "Authentication error"
+          schema: {$ref: '#/definitions/Error'}
+
+  /auth/refresh:
+    post:
+      operationId: 'refreshToken'
+      tags:
+      - "registration and authentication"
+      summary: "Update the access token"
+      security:
+        - signed: []
+      consumes: ['application/x-www-form-urlencoded']
+
+      parameters:
+      - in: path
+        name: refresh_token
+        type: string
+        required: true
+        description: "Value of `refresh_token` in `StartSession` object when login"
+
+      responses:
+        200:
+          description: "Return an object holding new token information"
+          schema:
+            $ref: '#/definitions/RefreshedTokens'
+        401:
+          description: "Authentication error. The `refresh_token` is invalid."
+          schema: {$ref: '#/definitions/Error'}
+            
+  /account:
+    post:
+        operationId: "createAccount"
+        tags:
+        - "account"
+        security:
+          - signed: []
+        summary: "Register an account using email"
+        description: "Register an account using email"
+        consumes: ['application/x-www-form-urlencoded']
+        parameters:
+        - in: formData
+          name: email
+          type: string
+          required: true
+        - in: formData
+          name: password
+          type: string
+          required: true
+        responses:
+          200:
+            description: "Register with email address successfully."
+            schema:
+              $ref: '#/definitions/UnverifiedAccount'
+    get:
+      operationId: "getAccount"
+      tags:
+      - "account"
+      summary: "Get account information"
+      security:
+        - signed: []
+          auth: []
+      responses:
+        200:
+          description: "Return the current user information"
+          schema:
+            $ref: '#/definitions/SocialUserSetting'
+        401:
+          description: "Authentication error"
+          schema: {$ref: '#/definitions/Error'}
+
+    put:
+      operationId: "updateAccount"
+      tags:
+      - "account"
+      summary: "Update account information"
+      security:
+        - signed: []
+          auth: []
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Request object contains new account information"
+        required: true
+        schema:
+          $ref: "#/definitions/SocialUserSetting"
+      responses:
+        200:
+          description: "Update successfully"
+          schema:
+            $ref: '#/definitions/SocialUserSetting'
+        400:
+          description: "Format error"
+            
+          schema: {$ref: '#/definitions/Error'}
+        401:
+          description: "Authentication error"
+          schema: {$ref: '#/definitions/Error'}
+          
+  /account/verify:
+    post:
+      operationId: "verifyAccount"
+      tags:
+      - "account"
+      summary: "Verify the email address associated with this account."
+
+      consumes: ['application/x-www-form-urlencoded']
+      parameters:
+      - in: formData
+        name: token
+        type: string
+        required: true
+
+      responses:
+        204:
+          description: "Activate account successfully"
+        404:
+          description: "Activate account failed. This status code is returned when no account is linked to this token."
+
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /users/{user_id}:
+    get:
+      operationId: "getUserInfo"
+      summary: Return the user associated with this id
+      tags:
+      - "users"
+
+      parameters:
+      - in: path
+        name: user_id
+        type: string
+        maxLength: 36
+        required: true
+      responses:
+        200:
+          description: ""
+          schema:
+            $ref: "#/definitions/User"
+        404:
+          description: "No user found with this id"
+          schema: {$ref: '#/definitions/Error'}
+            
+  /posts:
+    post:
+      operationId: "createPost"
+      tags:
+      - "posts"
+      summary: "Create a new post"
+      security:
+        - signed: []
+          auth: []
+      description: |
+        Create and publish a new post. Requires a request with access token
+
+      parameters:
+
+      - in: formData
+        name: message
+        type: string
+        required: false
+        description: "Post content"
+      - in: formData
+        name: media_id
+        type: array
+        required: false
+        collectionFormat: tsv
+        description: "Media IDs of images/videos"
+        items:
+          type: string
+      responses:
+        200:
+          description: "Create post successfully"
+          schema:
+            $ref: '#/definitions/Post'
+        400:
+          description: "Format error"
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: "Authentication error"
+          schema: {$ref: '#/definitions/Error'}
+
+    
+  /posts/{post_id}:
+    get:
+      operationId: "getPost"
+      summary: Get post details from post_id
+
+      tags:
+      - "posts"
+      parameters:
+      - in: "path"
+        name: "post_id"
+        description: "ID of the post"
+
+        required: true
+        type: string
+      responses:
+        200:
+          description: "Get post detail successfully."
+          schema:
+            $ref: '#/definitions/Post'
+        404:
+          description: "The post with specified post_id does not exist."
+          schema: {$ref: '#/definitions/Error'}
+          
+    delete:
+      operationId: "destroyPost"
+      summary: Destroy the post with specified post_id
+      security:
+        - signed: []
+          auth: []
+      tags:
+      - "posts"
+      parameters:
+      - in: "path"
+        name: "post_id"
+        description: "ID of the post"
+        required: true
+        type: string
+      responses:
+        204:
+          description: "Delete post successfully. Returns only status code."
+        403:
+          description: "Authority error. This post is not created by the authorized user."
+
+          schema:
+            $ref: "#/definitions/Error"
+
+    put:
+      operationId: editPost
+      summary: Update post
+      security:
+        - signed: []
+          auth: []
+      tags:
+      - "posts"
+      parameters:
+      - in: "path"
+        name: "post_id"
+        description: "ID of the post"
+        required: true
+        type: string
+      - in: formData
+        name: message
+        type: string
+        required: true
+        description: "Content of the post"
+
+      responses:
+        204:
+          description: "Update post successfully. Returns only status code."
+        403:
+          description: "Authority error. This post is not created by the authorized user."
+
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "The post with specified post_id does not exist."
+          schema: {$ref: '#/definitions/Error'}
+
+  /posts/timeline:
+    get:
+      operationId: "userTimeline"
+      summary: Returns the user timeline.
+      tags:
+      - "timeline"
+      parameters:
+      - in: "query"
+        name: "user_id"
+        type: string
+        description: "The user id. If not specified, the id of the authenticated user is used."
+        maxLength: 36
+        required: false
+      - in: "query"
+        name: "page"
+        type: integer
+      - in: "query"
+        name: "limit"
+        type: integer
+      responses:
+        200:
+          description: "Return the user timeline successfully."
+          schema:
+            $ref: "#/definitions/PostList"
+        404:
+          description: "The user with specified id does not exist."
+          schema: {$ref: '#/definitions/Error'}
+
+  /posts/publictimeline:
+    get:
+      operationId: "publicTimeline"
+      summary: "Get the public timeline"
+      tags:
+        - "timeline"
+      parameters:
+        - in: "query"
+          name: "page"
+          type: integer
+        - in: "query"
+          name: "limit"
+          type: integer
+      responses:
+        200:
+          description: "Return the public timeline"
+          schema:
+            $ref: "#/definitions/PostList"
+
+
+  /likes:
+    post:
+      operationId: "createLike"
+      tags:
+      - "personal"
+      summary: "Like a post."
+      security:
+        - signed: []
+          auth: []
+
+      parameters:
+      - in: "formData"
+        name: "post_id"
+        required: true
+        type: string
+      responses:
+        204:
+          description: "Like successfully"
+        401:
+          description: "Authentication error"
+          schema: {$ref: '#/definitions/Error'}
+        404:
+          description: "post_id does not exist"
+          schema: {$ref: '#/definitions/Error'}
+
+    delete:
+      operationId: "destroyLike"
+      tags:
+      - "personal"
+      summary: "Unlike a post"
+      security:
+        - signed: []
+          auth: []
+
+      parameters:
+      - in: "formData"
+        name: "post_id"
+        required: true
+        type: string
+      responses:
+        204: 
+          description: "Unlike successfully."
+        401:
+          description: "Authentication error"
+          schema: {$ref: '#/definitions/Error'}
+        404:
+          description: "post_id does not exist"
+          schema: {$ref: '#/definitions/Error'}
+
+  /replies:
+    post:
+      operationId: "createReply"
+      tags:
+      - "replies"
+      summary: "Create a reply to a post."
+      security:
+        - signed: []
+          auth: []
+      parameters:
+      - in: "formData"
+        name: "post_id"
+        required: true
+        type: integer
+      - in: formData
+        name: message
+        type: string
+        required: true
+      responses:
+        200:
+          description: "Create reply successfully"
+          schema:
+            $ref: "#/definitions/Reply"
+        401:
+          description: "Authentication error"
+          schema: {$ref: '#/definitions/Error'}
+        404:
+          description: "post_id does not exist"
+          schema: {$ref: '#/definitions/Error'}
+
+    delete:
+      operationId: "destroyReply"
+      tags:
+      - "replies"
+      summary: "Remove a reply."
+      security:
+        - signed: []
+          auth: []
+      parameters:
+      - in: "formData"
+        name: "reply_id"
+        required: true
+        type: integer
+      responses:
+        204:
+          description: "Remove reply successfully."
+        401:
+          description: "Authentication error"
+          schema: {$ref: '#/definitions/Error'}
+        403:
+          description: "Authorization error. The reply is not created by the authenticated user."
+          schema:
+            $ref: "#/definitions/Error"
+
+    put:
+      operationId: "editReply"
+      tags:
+      - "replies"
+      summary: "Edit a reply"
+      security:
+        - signed: []
+          auth: []
+
+      parameters:
+      - in: "formData"
+        name: "reply_id"
+        required: true
+        type: integer
+      - in: formData
+        name: message
+        type: string
+        required: true
+
+      responses:
+        204:
+          description: "Edit reply successfully"
+        401:
+          description: "Authentication error"
+          schema: {$ref: '#/definitions/Error'}
+        403:
+          description: "Authorization error. The reply is not created by the authenticated user."
+          schema:
+            $ref: "#/definitions/Error"
+
+  /replies/{post_id}:
+    get:
+      operationId: getReplies
+      summary: Get replies of a specific post.
+      tags:
+        - "replies"
+      parameters:
+      - in: "path"
+        name: "post_id"
+        description: "ID of the post"
+        required: true
+        type: string
+      - in: "query"
+        name: "page"
+        type: integer
+      - in: "query"
+        name: "limit"
+        type: integer
+      responses:
+        200:
+          description: "Get replies successfully."
+          schema:
+            $ref: '#/definitions/ReplyList'
+        404:
+          description: "The post with specified post_id does not exist."
+          schema: {$ref: '#/definitions/Error'}
+
+  /media/upload:
+    post:
+      operationId: mediaUpload
+      security:
+        - signed: []
+          auth: []
+      tags:
+      - media
+      description: "Upload media files such as images or videos."
+      consumes:
+      - multipart/form-data
+      parameters:
+      - in: formData
+        name: data
+        type: file
+        description: File data
+        required: true
+      - in: formData
+        name: type
+        type: string
+        enum:
+          - image/jpeg
+          - image/png
+          - video/*
+        required: true
+      responses:
+        200:
+          description: "Upload successfully."
+          schema:
+            $ref: '#/definitions/MediaFile'
+        400:
+          description: "Errors such as incorrect format or file is too large"
+          schema: {$ref: '#/definitions/Error'}
+        401:
+          description: "Authentication error"
+          schema: {$ref: '#/definitions/Error'}
+
+
+securityDefinitions:
+  signed:
+    type: apiKey
+    in: header
+    name: X-Validation
+    description: |
+      署名済みリクエスト。リクエスト情報をHMACを使用して生成したダイジェストメッセージを設定する。
+  auth:
+    type: apiKey
+    in: header
+    name: Authorized
+    description: |
+      署名済み+認証トークンつきリクエスト。このリクエストを送信する場合には、別途 X-Validation ヘッダーが必要となる。
+
+definitions:
+  UnverifiedAccount:
+    description: Unverified account information. Returned when the user has not verify their email address.
+      
+    properties:
+      expire:
+        type: integer
+        description: The expiration date of this account if the user does not verify their email address.
+        example: 1524727352
+  
+  SocialUserSetting:
+    description: "User settings. Name, email and user image can be changed."
+
+    required: 
+      - user_id
+      - name
+      - email
+    properties:
+      user_id:
+        type: string
+        maxLength: 36
+      email:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      user_image_url:
+        type: string
+        format: url
+        
+  StartSession:
+    description: "Return account information when first login."
+    required: ['user_id','access_token','expires_in','refresh_token']
+    properties:
+      need_profile_update:
+        type: boolean
+        description: a flag to indicate whether the user has updated their profile or not, use this boolean to display proper screen.
+      user_id:
+        type: string
+      settings:
+        $ref: '#/definitions/SocialUserSetting'
+      access_token:
+        type: string
+        description: The access token. Expired at the date set by `expires_in`
+      expires_in:
+        type: integer
+        description: The `access_token` will be expired at this date.
+      refresh_token:
+        type: string
+        description: When the access token expires, use `POST /session/refresh_token` to get the new access token.
+
+  RefreshedTokens:
+    description: Session object holding access token, expiration date and refresh token.
+    required: ['access_token','expires_in','refresh_token']
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      refresh_token:
+        type: string
+
+  Post:
+    type: "object"
+    required:
+      - post_id
+      - user
+      - created_at
+    properties:
+      post_id:
+        type: string
+        example: 60f7271f-735b-45fa-a0b5-699716a54746
+      permalink_url:
+        type: string
+        example: https://sungram.com/c/Cg4GDgQKCQQAAwQPBAwHDw
+      user:
+        $ref: "#/definitions/User"
+      message:
+        type: string
+        example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+      media:
+        type: array
+        items:
+          $ref: '#/definitions/MediaFile'
+      replies:
+        $ref: '#/definitions/ReplyList'
+      created_at:
+        type: integer
+        example: 1531140317
+      like_count:
+        type: integer
+        minimum: 0
+        example: 2345
+      reply_count:
+        type: integer
+        minimum: 0
+        example: 1234
+      liked:
+        type: boolean
+        example: true
+
+  ReplyList:
+    description: "A list of replies"
+
+    required:
+      - replies
+    properties:
+      replies:
+        type: array
+        items:
+          $ref: '#/definitions/Reply'
+      page:
+        type: integer
+        example: 1
+      page_size:
+        type: integer
+        example: 10
+      total_page:
+        type: integer
+        example: 2
+      total_items:
+        type: integer
+        example: 20
+
+  Reply:
+    properties:
+      reply_id:
+        type: string
+        maxLength: 36
+        example: b00c5549-8770-4830-8a35-d4a2cb5ab6ce
+      user:
+        $ref: "#/definitions/User"
+      message:
+        type: string
+        example: "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean."
+      created_at:
+        type: integer
+        example: 1531140549
+
+  User:
+    description: "Return the user information object."
+
+    type: "object"
+    required:
+      - user_id
+      - name
+      - user_image_url
+    properties:
+      user_id:
+        type: string
+        description: "The id of the user."
+        maxLength: 36
+        example: 0d553a81-dc08-40e7-bee3-c9e621caab9e
+      name:
+        type: string
+        description: "Name of the user"
+        example: "Peter Parker"
+      user_image_url:
+        type: string
+        format: url
+        description: "Avatar url of the user."
+        example: "http://placehold.jp/50x50.png"
+      description:
+        type: string
+        description: "User description."
+        example: |-
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi efficitur eleifend justo, sed facilisis erat laoreet eu. Integer at eros sit amet nulla ultrices dignissim quis vel massa.
+          Aliquam vel dignissim nibh. Praesent condimentum, augue quis pretium pulvinar, dolor ipsum accumsan magna, sit amet commodo enim lorem eu lectus.
+          Sed pretium odio ut libero consectetur, at hendrerit dui faucibus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. 
+          http://example.com/
+
+  PostList:
+    description: A list of posts.
+
+    type: object
+    required:
+      - posts
+    properties:
+      posts:
+        type: array
+        items:
+          $ref: "#/definitions/Post"
+      page:
+        type: integer
+        example: 1
+      page_size:
+        type: integer
+        example: 10
+      total_page:
+        type: integer
+        example: 2
+      total_items:
+        type: integer
+        example: 20
+
+
+  MediaFile:
+    description: Media file object.
+    type: object
+    required:
+      - media_id
+      - created_at
+      - media_urls
+    properties:
+      media_id:
+        type: string
+        description: The media ID, assumed to be UUID representation with up to 36 characters.
+        example: f589550b-9dd8-4a96-8b12-12eee5d3c513
+      created_at:
+        type: integer
+        example: 1531141228
+      media_urls:
+        type: array
+        description: "Media files can be of multiple format. Always return at least one or more items"
+        minItems: 1
+        items:
+          type: object
+          required:
+            - url
+            - mediaType
+          properties:
+            url: {type: string, format: url, description: "Media url, client use this url to display the media.", example: "http://placehold.jp/1500x900.png" }
+            mediaType: {type: string, description: "Media type (mime format). See `POST /media/upload` for more detail.", example: image/jpeg }
+
+  Error:
+    description: Error info
+    type: "object"
+    required:
+      - messages
+    properties:
+      messages:
+        type: object
+        description: "Using key:value format to hold error information. For example if the format of the email address is incorrect at the account registration process, an error is linked to the object as shown below
+
+            {
+              \"emailAddress\": \"There is an error in the format of the email address.\",
+              \"password\": \"The password must be at least 8 character long.\"
+            }"
+            
+      forceMessage:
+        type: object
+        description: For the client to display, for example when an application version needs to be upgraded
+
+        required:
+          - message
+        properties:
+          message:
+            type: string
+            description: "The message." 
+          link:
+            type: object
+            description: "If the link is set, display it along side the message."
+
+            required:
+              - label
+              - url
+
+            properties:
+              label:
+                type: string
+              url:
+                type: string
+                format: url
