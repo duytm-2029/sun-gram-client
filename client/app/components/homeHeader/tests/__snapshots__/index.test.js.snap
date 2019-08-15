@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Header /> should render a div 1`] = `
+<div
+  class="makeStyles-header-1"
+>
+  <h1
+    class="MuiTypography-root MuiTypography-h5"
+  >
+    <span>
+      Sun*Gram
+    </span>
+  </h1>
+</div>
+`;
