@@ -1,7 +1,7 @@
 // - Import react components
 import React, { Component } from 'react';
-import _ from 'lodash';
-import { Route, Switch, withRouter, Redirect, NavLink } from 'react-router-dom';
+import { withRouter, NavLink } from 'react-router-dom';
+import { push } from 'connected-react-router';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 
@@ -16,7 +16,10 @@ import SvgHome from '@material-ui/icons/Home';
 import SvgSettings from '@material-ui/icons/Settings';
 import SvgAccountCircle from '@material-ui/icons/AccountCircle';
 import Hidden from '@material-ui/core/Hidden';
+import { FormattedMessage } from 'react-intl';
 import { HomeRouter } from '../../routes/HomeRouter';
+
+import messages from './messages';
 
 // - Import app components
 import HomeHeader from '../homeHeader';
@@ -109,6 +112,12 @@ const styles = theme => ({
       marginRight: 0,
     },
   },
+  underline: {
+    textDecoration: 'none',
+  },
+  nonePaddingLeft: {
+    paddingLeft: '0px',
+  },
 });
 
 // - Create Home component class
@@ -134,7 +143,10 @@ export class HomeComponent extends Component {
   };
 
   componentWillMount() {
-    // do some thing
+    const { authed, goTo } = this.props;
+    if (!authed) {
+      goTo('/login');
+    }
   }
 
   /**
@@ -146,41 +158,45 @@ export class HomeComponent extends Component {
    */
   render() {
     const HR = HomeRouter;
-    const {
-      loaded,
-      authed,
-      mergedPosts,
-      hasMorePosts,
-      classes,
-      theme,
-    } = this.props;
-    const loadDataStream = { lastPostId: 'wZd272jJzEYL0DGamuI9' };
+    const { uid, mergedPosts, hasMorePosts, classes, theme } = this.props;
     const { drawerOpen } = this.state;
     const drawer = (
       <div>
-        <NavLink to="/">
+        <NavLink to="/" className={classes.underline}>
           <MenuItem style={{ color: 'rgb(117, 117, 117)' }}>
             <ListItemIcon>
               <SvgHome />
             </ListItemIcon>
-            <ListItemText inset primary="home" />
+            <ListItemText
+              className={classes.nonePaddingLeft}
+              inset
+              primary={<FormattedMessage {...messages.home} />}
+            />
           </MenuItem>
         </NavLink>
-        <NavLink to={`/${this.props.uid}`}>
+        <NavLink to={`/${uid}`} className={classes.underline}>
           <MenuItem style={{ color: 'rgb(117, 117, 117)' }}>
             <ListItemIcon>
               <SvgAccountCircle />
             </ListItemIcon>
-            <ListItemText inset primary="profile" />
+            <ListItemText
+              className={classes.nonePaddingLeft}
+              inset
+              primary={<FormattedMessage {...messages.profile} />}
+            />
           </MenuItem>
         </NavLink>
         <Divider />
-        <NavLink to="/settings">
+        <NavLink to="/settings" className={classes.underline}>
           <MenuItem style={{ color: 'rgb(117, 117, 117)' }}>
             <ListItemIcon>
               <SvgSettings />
             </ListItemIcon>
-            <ListItemText inset primary="settings" />
+            <ListItemText
+              className={classes.nonePaddingLeft}
+              inset
+              primary={<FormattedMessage {...messages.setting} />}
+            />
           </MenuItem>
         </NavLink>
       </div>
@@ -245,7 +261,7 @@ export class HomeComponent extends Component {
               },
             )}
           >
-            <HR enabled data={{ mergedPosts, loadDataStream, hasMorePosts }} />
+            <HR enabled data={{ mergedPosts, hasMorePosts }} />
           </main>
         </div>
       </div>
@@ -254,54 +270,25 @@ export class HomeComponent extends Component {
 }
 
 // - Map dispatch to props
-
+const mapDispatchToProps = dispatch => ({
+  goTo: url => dispatch(push(url)),
+});
 /**
  * Map state to props
  * @param  {object} state is the obeject from redux store
  * @param  {object} ownProps is the props belong to component
  * @return {object}          props of component
  */
-const mapStateToProps = () => ({
-  uid: 'hAHapsdojasHDsahd123k123123',
+const mapStateToProps = state => ({
   authed: true,
-  isVerifide: true,
-  mergedPosts: [
-    {
-      ownerUserId: 'dsfzsdffdsafds',
-      ownerDisplayName: 'Tran Manh Duy',
-      creationDate: 1565631211,
-      image: '',
-      body: 'how are you?',
-      id: '787',
-      commentCounter: 2,
-    },
-    {
-      ownerUserId: '6234243243',
-      ownerDisplayName: 'Nguyen Thi A',
-      creationDate: 1565631211,
-      image: '',
-      body: 'are you feeling?',
-      id: '423f',
-      commentCounter: 4,
-    },
-    {
-      ownerUserId: '1dfsd123123',
-      ownerDisplayName: 'Truong Quoc B',
-      creationDate: 1565631211,
-      image: '',
-      body: 'be happy',
-      id: '2143xcv',
-      commentCounter: 10,
-    },
-  ],
-  global,
+  mergedPosts: state.posts.data,
   hasMorePosts: false,
-  loaded: true,
 });
 
 // - Connect component to redux store
 export default withRouter(
-  connect(mapStateToProps)(
-    withStyles(styles, { withTheme: true })(HomeComponent),
-  ),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(withStyles(styles, { withTheme: true })(HomeComponent)),
 );

@@ -17,11 +17,14 @@ import { withStyles } from '@material-ui/core/styles';
 import Menu from '@material-ui/core/Menu';
 import Grid from '@material-ui/core/Grid/Grid';
 import { Card, CardHeader, CardContent } from '@material-ui/core';
+import { FormattedMessage } from 'react-intl';
 
 // - Import app components
 import ImageGallery from '../imageGallery';
 import Img from '../Img';
 import UserAvatarComponent from '../userAvatar';
+
+import messages from './messages';
 
 // - Import API
 // import * as PostAPI from 'api/PostAPI'
@@ -420,7 +423,7 @@ export class PostWriteComponent extends Component {
                         autoFocus
                         value={this.state.postText}
                         onChange={this.handleOnChange}
-                        placeholder="post.textareaPlaceholder"
+                        placeholder="What's new with you?"
                         multiline
                         rows={2}
                         rowsMax={4}
@@ -454,7 +457,7 @@ export class PostWriteComponent extends Component {
               onClick={this.props.onRequestClose}
               style={{ color: grey[800] }}
             >
-              post.cancelButton
+              <FormattedMessage {...messages.postCancelButton} />
             </Button>
             <Button
               color="primary"
@@ -463,7 +466,11 @@ export class PostWriteComponent extends Component {
               onClick={this.handlePost}
               disabled={this.state.disabledPost}
             >
-              {this.props.edit ? 'post.updateButton' : 'post.postButton'}
+              {this.props.edit ? (
+                <FormattedMessage {...messages.updateButton} />
+              ) : (
+                <FormattedMessage {...messages.postButton} />
+              )}
             </Button>
           </DialogActions>
         </Dialog>
@@ -486,7 +493,7 @@ export class PostWriteComponent extends Component {
               onClick={this.handleCloseGallery}
               style={{ color: grey[800] }}
             >
-              post.cancelButton
+              <FormattedMessage {...messages.cancelButton} />
             </Button>
           </DialogActions>
         </Dialog>

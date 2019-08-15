@@ -10,12 +10,15 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import InfiniteScroll from 'react-infinite-scroller';
+import { FormattedMessage } from 'react-intl';
 
 // - Import app components
 import PostComponent from '../../components/Posts';
 import PostWriteComponent from '../../components/postWrite';
 import UserAvatarComponent from '../../components/userAvatar';
 import LoadMoreProgressComponent from '../../layouts/loadMoreProgress';
+
+import messages from './messages';
 
 // - Import API
 import * as PostAPI from '../../api/PostAPI';
@@ -86,7 +89,11 @@ export class StreamComponent extends Component {
   postLoad = () => {
     const { posts } = this.props;
     if (posts === undefined || !Object.keys(posts).length > 0) {
-      return <h1>Nothing has shared.</h1>;
+      return (
+        <h1>
+          <FormattedMessage {...messages.notShare} />
+        </h1>
+      );
     }
     const postBack = { oddPostList: [], evenPostList: [] };
     const parsedPosts = [];
@@ -109,10 +116,7 @@ export class StreamComponent extends Component {
           ) : (
             ''
           )}
-          <PostComponent
-            key={`${post.id}-stream-div-post`}
-            post={post}
-          />
+          <PostComponent key={`${post.id}-stream-div-post`} post={post} />
         </div>
       );
 
@@ -142,7 +146,7 @@ export class StreamComponent extends Component {
    * @return {react element} return the DOM which rendered by component
    */
   render() {
-    const { displayWriting, hasMorePosts, translate } = this.props;
+    const { displayWriting, hasMorePosts } = this.props;
     const postList = this.postLoad();
     return (
       <InfiniteScroll
@@ -178,7 +182,7 @@ export class StreamComponent extends Component {
                       inset
                       primary={
                         <span style={this.styles.postWritePrimaryText}>
-                          What's on your mind?
+                          <FormattedMessage {...messages.status} />
                         </span>
                       }
                     />

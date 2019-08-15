@@ -339,7 +339,7 @@ export class CommentComponent extends Component {
             onClick={this.handleUpdateComment}
           >
             {' '}
-            updateButton{' '}
+            <FormattedMessage {...messages.updateButton} />{' '}
           </Button>
           <Button
             color="primary"
@@ -347,7 +347,7 @@ export class CommentComponent extends Component {
             onClick={this.handleCancelEdit}
           >
             {' '}
-            cancelButton{' '}
+            <FormattedMessage {...messages.cancelButton} />{' '}
           </Button>
         </div>
       </div>

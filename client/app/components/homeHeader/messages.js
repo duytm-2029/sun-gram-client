@@ -12,4 +12,12 @@ export default defineMessages({
     id: `${scope}.logo`,
     defaultMessage: 'Sun*Gram',
   },
+  myAccount: {
+    id: `${scope}.account`,
+    defaultMessage: 'My Account',
+  },
+  logOut: {
+    id: `${scope}.logout`,
+    defaultMessage: 'Logout',
+  },
 });

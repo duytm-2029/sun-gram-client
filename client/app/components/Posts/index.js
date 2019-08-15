@@ -22,6 +22,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedMessage } from 'react-intl';
 
 // - Import app components
 import CommentGroup from '../commentGroup';
@@ -29,6 +30,8 @@ import ShareDialog from '../shareDialog';
 import PostWrite from '../postWrite';
 import Img from '../Img';
 import UserAvatar from '../userAvatar';
+
+import messages from './messages';
 
 // - Import actions
 
@@ -305,8 +308,12 @@ export class PostComponent extends Component {
           }}
           onClose={this.closePostMenu}
         >
-          <MenuItem onClick={this.handleOpenPostWrite}> post.edit </MenuItem>
-          <MenuItem onClick={this.handleDelete}> post.delete </MenuItem>
+          <MenuItem onClick={this.handleOpenPostWrite}>
+            <FormattedMessage {...messages.postEdit} />
+          </MenuItem>
+          <MenuItem onClick={this.handleDelete}>
+            <FormattedMessage {...messages.postDel} />
+          </MenuItem>
         </Menu>
       </div>
     );

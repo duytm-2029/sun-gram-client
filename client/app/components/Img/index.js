@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import SvgImage from '@material-ui/icons/Image';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedMessage } from 'react-intl';
+
+import messages from './messages';
 
 // - Import API
 
@@ -97,7 +100,9 @@ export class ImgComponent extends Component {
         >
           <div className={classes.loadingContent}>
             <SvgImage className={classes.loadingImage} />
-            <div>image.notLoaded</div>
+            <div>
+              <FormattedMessage {...messages.notLoaded} />
+            </div>
           </div>
         </div>
       </div>

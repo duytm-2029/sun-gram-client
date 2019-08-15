@@ -20,4 +20,12 @@ export default defineMessages({
     id: `${scope}.deleteButton`,
     defaultMessage: 'delete',
   },
+  updateButton: {
+    id: `${scope}.updateButton`,
+    defaultMessage: 'Update',
+  },
+  cancelButton: {
+    id: `${scope}.cancelButton`,
+    defaultMessage: 'Cancel',
+  },
 });

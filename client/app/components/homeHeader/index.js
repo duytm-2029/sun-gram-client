@@ -14,12 +14,14 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedMessage } from 'react-intl';
 
 // - Import components
 import UserAvatarComponent from '../userAvatar';
 import Notify from '../Notify';
 
 import config from '../../config';
+import messages from './messages';
 
 const styles = {
   root: {
@@ -182,7 +184,7 @@ export class HomeHeaderComponent extends Component {
           {/* Notification */}
           <div className="homeHeader__right">
             {'this.props.notifyCount' > 0 ? (
-              <Tooltip title="header.notificationTooltip">
+              <Tooltip title="notifications">
                 <IconButton onClick={this.handleNotifyTouchTap}>
                   <div className="homeHeader__notify">
                     <div className="title">notifyCount</div>
@@ -190,7 +192,7 @@ export class HomeHeaderComponent extends Component {
                 </IconButton>
               </Tooltip>
             ) : (
-              <Tooltip title="header.notificationTooltip">
+              <Tooltip title="notifications">
                 <IconButton onClick={this.handleNotifyTouchTap}>
                   <NotificationsIcon
                     style={{ color: theme.palette.common.white }}
@@ -234,14 +236,14 @@ export class HomeHeaderComponent extends Component {
                 }}
               >
                 {' '}
-                {'header.myAccount'}{' '}
+                <FormattedMessage {...messages.myAccount} />{' '}
               </MenuItem>
               <MenuItem
                 style={{ fontSize: '14px' }}
                 onClick={this.handleLogout}
               >
                 {' '}
-                {'header.logout'}{' '}
+                <FormattedMessage {...messages.logOut} />{' '}
               </MenuItem>
             </Menu>
           </div>

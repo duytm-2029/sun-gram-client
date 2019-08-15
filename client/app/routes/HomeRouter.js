@@ -19,7 +19,7 @@ export class HomeRouter extends Component {
           component={
             <div>
               <Stream
-                homeTitle="header.home"
+                homeTitle="Home"
                 posts={data.mergedPosts}
                 loadStream={data.loadDataStream}
                 hasMorePosts={data.hasMorePosts}

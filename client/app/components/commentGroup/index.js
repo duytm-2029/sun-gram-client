@@ -13,6 +13,9 @@ import { withStyles } from '@material-ui/core/styles';
 import { Card, CardActions, CardHeader } from '@material-ui/core';
 import classNames from 'classnames';
 import moment from 'moment/moment';
+import {FormattedMessage} from 'react-intl';
+
+import messages from './messages';
 
 // - Import actions
 
@@ -250,7 +253,7 @@ export class CommentGroupComponent extends Component {
               subheader={
                 <TextField
                   autoFocus
-                  placeholder="comment.addCommentPlaceholder"
+                  placeholder="Add a comment ..."
                   multiline
                   rowsMax="4"
                   InputProps={{
@@ -271,7 +274,7 @@ export class CommentGroupComponent extends Component {
                 disabled={this.state.postDisable}
                 onClick={this.handlePostComment}
               >
-                comment.postButton
+                <FormattedMessage {...messages.commentPostButton} />
               </Button>
             </CardActions>
           </Card>

@@ -16,6 +16,7 @@ import {
 } from '@material-ui/core';
 import SvgLink from '@material-ui/icons/Link';
 import classNames from 'classnames';
+import { FormattedMessage } from 'react-intl';
 
 import {
   FacebookShareButton,
@@ -28,6 +29,7 @@ import {
   LinkedinIcon,
 } from 'react-share';
 
+import messages from './messages';
 // - Import app components
 
 // - Import API
@@ -180,7 +182,7 @@ export class ShareDialogComponent extends Component {
                 variant="h5"
                 component="h2"
               >
-                Link has been copied to clipboard ...
+                <FormattedMessage {...messages.alertCopied} />
               </Typography>
             </div>
           )}

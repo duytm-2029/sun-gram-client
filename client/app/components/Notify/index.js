@@ -5,6 +5,9 @@ import Popover from '@material-ui/core/Popover';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
+import { FormattedMessage } from 'react-intl';
+
+import messages from './messages';
 
 // - Import app components
 
@@ -82,7 +85,12 @@ export class NotifyComponent extends Component {
    */
   render() {
     const { classes, anchorEl, onRequestClose, open } = this.props;
-    const noNotify = <div className={classes.noNotify}>All caught up! </div>;
+    const noNotify = (
+      <div className={classes.noNotify}>
+        {' '}
+        <FormattedMessage {...messages.notingNotify} />{' '}
+      </div>
+    );
     const items = this.notifyItemList();
     return (
       <Popover

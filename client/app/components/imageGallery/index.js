@@ -5,6 +5,9 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedMessage } from 'react-intl';
+
+import messages from './messages';
 
 // - Import actions
 
@@ -60,7 +63,7 @@ const styles = theme => ({
     justifyContent: 'center',
     alignItems: 'center',
     height: '100%',
-  }
+  },
 });
 
 /**
@@ -140,9 +143,7 @@ export class ImageGalleryComponent extends Component {
       <div className={classes.root}>
         <GridList cellHeight={180} className={classes.gridList}>
           <GridListTile key="upload-image-gallery">
-            <div
-              className={classes.updaloadImage}
-            >
+            <div className={classes.updaloadImage}>
               <input
                 accept="image/*"
                 className={classes.uploadInput}
@@ -156,7 +157,7 @@ export class ImageGalleryComponent extends Component {
                   component="span"
                   className={classes.uploadButton}
                 >
-                  {'imageGallery.uploadButton'}
+                  <FormattedMessage {...messages.uploadButton} />
                 </Button>
               </label>
             </div>
