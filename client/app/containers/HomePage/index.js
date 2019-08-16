@@ -5,39 +5,53 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect, memo } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { useInjectReducer } from 'utils/injectReducer';
+import { useInjectSaga } from 'utils/injectSaga';
+import { compose } from 'redux';
 import Home from '../../components/Home';
+import saga from './saga';
+import reducer from './reducer';
+import * as actions from './actions';
 
-import * as postsAction from '../../actions/posts';
-class HomePage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+const key = 'home';
 
-  componentWillMount() {
-    this.props.loadPublicTimeline();
-  }
+function HomePage({ loadData, uid }) {
+  useInjectReducer({ key, reducer });
+  useInjectSaga({ key, saga });
 
-  render() {
-    return <Home data={this.props.uid} />;
-  }
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  return <Home data={uid} />;
 }
-function mapStateToProps() {
+
+function mapDispatchToProps(dispatch) {
+  return {
+    loadData: () => dispatch(actions.getPostsRequest()),
+  };
+}
+
+function mapStateToProps(state) {
   return {
     uid: '1234567890',
   };
 }
-const mapDispatchToProps = {
-  loadPublicTimeline: postsAction.dbGetPosts,
-};
+
 HomePage.propTypes = {
   uid: PropTypes.string,
-  loadPublicTimeline: PropTypes.func,
+  loadData: PropTypes.func,
 };
-export default connect(
+
+const withConnect = connect(
   mapStateToProps,
   mapDispatchToProps,
+);
+
+export default compose(
+  withConnect,
+  memo,
 )(HomePage);

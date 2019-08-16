@@ -15,6 +15,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import { FormattedMessage } from 'react-intl';
+import { connect } from 'react-redux';
 
 // - Import components
 import UserAvatarComponent from '../userAvatar';
@@ -176,7 +177,7 @@ export class HomeHeaderComponent extends Component {
                   'homeHeader__title-right': anchor === 'right',
                 })}
               >
-                Home
+                {this.props.title}
               </div>
             </Hidden>
           </div>
@@ -253,4 +254,12 @@ export class HomeHeaderComponent extends Component {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(HomeHeaderComponent);
+function mapStateToProps(state) {
+  const title = state.stream ? state.stream.title : '';
+  return {
+    title,
+  };
+}
+export default connect(mapStateToProps)(
+  withStyles(styles, { withTheme: true })(HomeHeaderComponent),
+);

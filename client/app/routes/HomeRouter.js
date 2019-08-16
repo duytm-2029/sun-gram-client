@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Route, Switch, withRouter, Redirect, NavLink } from 'react-router-dom';
 import PrivateRoute from './PrivateRouter';
-import Stream from '../containers/Streams';
+import Stream from '../containers/Streams/Loadable';
 
 /**
  * Home Router
@@ -21,7 +21,6 @@ export class HomeRouter extends Component {
               <Stream
                 homeTitle="Home"
                 posts={data.mergedPosts}
-                loadStream={data.loadDataStream}
                 hasMorePosts={data.hasMorePosts}
                 displayWriting
               />

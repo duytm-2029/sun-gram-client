@@ -279,11 +279,14 @@ const mapDispatchToProps = dispatch => ({
  * @param  {object} ownProps is the props belong to component
  * @return {object}          props of component
  */
-const mapStateToProps = state => ({
-  authed: true,
-  mergedPosts: state.posts.data,
-  hasMorePosts: false,
-});
+const mapStateToProps = state => {
+  const posts = state.home ? state.home.posts : [];
+  return {
+    authed: true,
+    mergedPosts: posts,
+    hasMorePosts: false,
+  };
+};
 
 // - Connect component to redux store
 export default withRouter(

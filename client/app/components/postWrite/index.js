@@ -6,15 +6,11 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
 import { grey } from '@material-ui/core/colors';
-import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
 
 import SvgRemoveImage from '@material-ui/icons/RemoveCircle';
 import SvgCamera from '@material-ui/icons/PhotoCamera';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { withStyles } from '@material-ui/core/styles';
-import Menu from '@material-ui/core/Menu';
 import Grid from '@material-ui/core/Grid/Grid';
 import { Card, CardHeader, CardContent } from '@material-ui/core';
 import { FormattedMessage } from 'react-intl';
@@ -30,6 +26,7 @@ import messages from './messages';
 // import * as PostAPI from 'api/PostAPI'
 
 // - Import actions
+import * as actions from '../../containers/Streams/actions';
 
 const styles = theme => ({
   fullPageXs: {
@@ -145,7 +142,7 @@ const styles = theme => ({
     fontSize: '14px',
     margin: '0 16px',
     flexShrink: 0,
-    width: 'initial',
+    width: '400px',
     flexGrow: 1,
   },
   openGallerly: {
@@ -206,14 +203,6 @@ export class PostWriteComponent extends Component {
        */
       galleryOpen: false,
       /**
-       * Whether menu is open
-       */
-      menuOpen: false,
-      /**
-       * Menu anchor element
-       */
-      menuAnchorEl: null,
-      /**
        * If it's true post button will be disabled
        */
       disabledPost: true,
@@ -252,32 +241,48 @@ export class PostWriteComponent extends Component {
    *
    * @memberof PostWrite
    */
-  handleRemoveImage = () => {};
+  handleRemoveImage = () => {
+    this.setState({
+      image: '',
+      imageFullPath: '',
+      disabledPost: this.state.postText.trim() === '',
+    });
+  };
 
   /**
    * Handle send post to the server
    * @param  {event} evt passed by clicking on the post button
    */
-  handlePost = () => {};
+  handlePost = () => {
+    const { image, imageFullPath, postText } = this.state;
 
-  /**
-   * Handle open more menu
-   */
-  handleOpenMenu = event => {
-    this.setState({
-      menuOpen: true,
-      menuAnchorEl: event.currentTarget,
-    });
-  };
-
-  /**
-   * Handle close more menu
-   */
-  handleCloseMenu = () => {
-    this.setState({
-      menuOpen: false,
-      menuAnchorEl: null,
-    });
+    const {
+      id,
+      ownerAvatar,
+      ownerDisplayName,
+      edit,
+      onRequestClose,
+      post,
+      postModel,
+    } = this.props;
+    if (image === '' && postText.trim() === '') {
+      this.setState({
+        disabledPost: false,
+      });
+    }
+    if (!edit) {
+      if (image !== '') {
+      } else {
+        post(
+          {
+            body: postText,
+            ownerAvatar,
+            ownerDisplayName,
+          },
+          onRequestClose,
+        );
+      }
+    }
   };
 
   /**
@@ -334,7 +339,34 @@ export class PostWriteComponent extends Component {
     });
   };
 
-  componentWillReceiveProps(nextProps) {}
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.open) {
+      const { postModel } = this.props;
+      this.setState({
+        /**
+         * Post text
+         */
+        postText: this.props.edit && postModel ? postModel.body : '',
+        /**
+         * The URL image of the post
+         */
+        image: this.props.edit && postModel ? postModel.image : '',
+        /**
+         * The path identifier of image on the server
+         */
+        imageFullPath:
+          this.props.edit && postModel ? postModel.imageFullPath : '',
+        /**
+         * If it's true gallery will be open
+         */
+        galleryOpen: false,
+        /**
+         * If it's true post button will be disabled
+         */
+        disabledPost: true,
+      });
+    }
+  }
 
   /**
    * Reneder component DOM
@@ -410,11 +442,7 @@ export class PostWriteComponent extends Component {
         >
           <DialogContent className={classes.content} style={{ paddingTop: 0 }}>
             <Card elevation={0}>
-              <CardHeader
-                title={author}
-                avatar={postAvatar}
-                // action={rightIconMenu}
-              />
+              <CardHeader title={author} avatar={postAvatar} />
               <CardContent>
                 <Grid item xs={12}>
                   <div className={classes.dialogGridDiv}>
@@ -460,7 +488,7 @@ export class PostWriteComponent extends Component {
               <FormattedMessage {...messages.postCancelButton} />
             </Button>
             <Button
-              color="primary"
+              color="secondary"
               disableFocusRipple
               disableRipple
               onClick={this.handlePost}
@@ -505,7 +533,12 @@ export class PostWriteComponent extends Component {
 /**
  * Map dispatch to props
  */
-
+function mapDispatchToProps(dispatch) {
+  return {
+    post: (body, cb) => dispatch(actions.postRequest(body, cb)),
+    update: () => dispatch(),
+  };
+}
 /**
  * Map state to props
  * @param  {object} state is the obeject from redux store
@@ -524,4 +557,7 @@ const mapStateToProps = () => {
 };
 
 // - Connect component to redux store
-export default connect(mapStateToProps)(withStyles(styles)(PostWriteComponent));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withStyles(styles)(PostWriteComponent));
